@@ -1,0 +1,8 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.pfx
+Output/
+!Output/ThinkMineSetup-v1.1.0.exe
