@@ -255,76 +255,7 @@
             </Grid>
 
 
-            <!-- Unsaved Changes Overlay -->
-            <Grid x:Name="UnsavedOverlay" Visibility="Collapsed" Background="#CCFFFFFF">
-            </Grid>
 
-            <!-- Welcome Overlay (Onboarding) -->
-            <Grid x:Name="WelcomeOverlay" Visibility="Collapsed" Background="White" MouseLeftButtonDown="WelcomeOverlay_Click">
-                <TextBlock x:Name="WelcomeText" 
-                           Text="" 
-                           FontSize="32" 
-                           FontWeight="Light" 
-                           Foreground="#333" 
-                           HorizontalAlignment="Center" 
-                           VerticalAlignment="Center"
-                           IsHitTestVisible="False"/>
-                <TextBlock Text="Click anywhere to start" 
-                           FontSize="14" 
-                           Foreground="#999" 
-                           HorizontalAlignment="Center" 
-                           VerticalAlignment="Bottom" 
-                           Margin="0,0,0,50"
-                           Opacity="0.5"/>
-            </Grid>
-
-            <!-- Tutorial Overlay -->
-            <Grid x:Name="TutorialOverlay" Visibility="Collapsed" Background="#80FFFFFF">
-                <!-- Instruction Panel -->
-                <Border Background="White" 
-                        BorderBrush="#DDD" 
-                        BorderThickness="1" 
-                        CornerRadius="8" 
-                        Padding="20" 
-                        Width="300" 
-                        HorizontalAlignment="Center" 
-                        VerticalAlignment="Center">
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="20" ShadowDepth="5" Color="#20000000" Opacity="0.3"/>
-                    </Border.Effect>
-                    <StackPanel>
-                        <TextBlock x:Name="TutorialTitle" Text="Welcome to ThinkMine" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-                        <TextBlock x:Name="TutorialInstruction" Text="Let's take a quick tour of the features." TextWrapping="Wrap" FontSize="14" Foreground="#555" Margin="0,0,0,20"/>
-                        
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button x:Name="TutorialSkipBtn" Content="Skip" Click="TutorialSkip_Click" Background="Transparent" BorderThickness="0" Foreground="#999" Margin="0,0,10,0" Cursor="Hand"/>
-                            <Button x:Name="TutorialNextBtn" Content="Next" Click="TutorialNext_Click" Background="#333" Foreground="White" Padding="15,8" BorderThickness="0" Cursor="Hand">
-                                <Button.Resources>
-                                    <Style TargetType="Border">
-                                        <Setter Property="CornerRadius" Value="4"/>
-                                    </Style>
-                                </Button.Resources>
-                            </Button>
-                        </StackPanel>
-                        </StackPanel>
-
-
-                </Border>
-                
-                <!-- Spotlight Highlight -->
-                <Border x:Name="TutorialSpotlight" 
-                        BorderBrush="#4CAF50" 
-                        BorderThickness="3" 
-                        CornerRadius="4" 
-                        Visibility="Collapsed" 
-                        HorizontalAlignment="Left" 
-                        VerticalAlignment="Top"
-                        IsHitTestVisible="False">
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="10" Color="#4CAF50" Opacity="0.5"/>
-                    </Border.Effect>
-                </Border>
-            </Grid>
             
             <!-- Docker Overlay (Mini Mode) -->
             <Grid x:Name="DockerOverlay" Visibility="Collapsed" Background="Transparent">
@@ -409,6 +340,98 @@
                         </Border>
                     </StackPanel>
                 </Grid>
+            </Grid>
+
+            <!-- Welcome Overlay (Onboarding) -->
+            <Grid x:Name="WelcomeOverlay" Visibility="Collapsed" Background="White" MouseLeftButtonDown="WelcomeOverlay_Click">
+                <TextBlock x:Name="WelcomeText" 
+                           Text="" 
+                           FontSize="32" 
+                           FontWeight="Light" 
+                           Foreground="#333" 
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Center"
+                           IsHitTestVisible="False"/>
+                <TextBlock Text="Click anywhere to start" 
+                           FontSize="14" 
+                           Foreground="#999" 
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Bottom" 
+                           Margin="0,0,0,50"
+                           Opacity="0.5"/>
+            </Grid>
+
+            <!-- Tutorial Overlay -->
+            <Grid x:Name="TutorialOverlay" Visibility="Collapsed" Background="#80FFFFFF">
+                <!-- Instruction Panel -->
+                <Border Background="White" 
+                        BorderBrush="#DDD" 
+                        BorderThickness="1" 
+                        CornerRadius="8" 
+                        Padding="20" 
+                        Width="300" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" ShadowDepth="5" Color="#20000000" Opacity="0.3"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <TextBlock x:Name="TutorialTitle" Text="Welcome to ThinkMine" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                        <TextBlock x:Name="TutorialInstruction" Text="Let's take a quick tour of the features." TextWrapping="Wrap" FontSize="14" Foreground="#555" Margin="0,0,0,20"/>
+                        
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button x:Name="TutorialSkipBtn" Content="Skip" Click="TutorialSkip_Click" Background="Transparent" BorderThickness="0" Foreground="#999" Margin="0,0,10,0" Cursor="Hand"/>
+                            <Button x:Name="TutorialNextBtn" Content="Next" Click="TutorialNext_Click" Background="#333" Foreground="White" Padding="15,8" BorderThickness="0" Cursor="Hand">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="4"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+                        </StackPanel>
+                        </StackPanel>
+
+
+                </Border>
+                
+                <!-- Spotlight Highlight -->
+                <Border x:Name="TutorialSpotlight" 
+                        BorderBrush="#4CAF50" 
+                        BorderThickness="3" 
+                        CornerRadius="4" 
+                        Visibility="Collapsed" 
+                        HorizontalAlignment="Left" 
+                        VerticalAlignment="Top"
+                        IsHitTestVisible="False">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="10" Color="#4CAF50" Opacity="0.5"/>
+                    </Border.Effect>
+                </Border>
+            </Grid>
+
+            <!-- Unsaved Changes Overlay (Highest Priority) -->
+            <Grid x:Name="UnsavedOverlay" Visibility="Collapsed" Background="#CCFFFFFF">
+                <Border Background="White" BorderBrush="#DDD" BorderThickness="1" CornerRadius="8" Padding="20" Width="300" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" ShadowDepth="5" Color="#20000000" Opacity="0.3"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <TextBlock Text="Unsaved Changes" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+                        <TextBlock Text="You have unsaved changes. Do you want to save them before continuing?" TextWrapping="Wrap" FontSize="14" Foreground="#555" Margin="0,0,0,20"/>
+                        
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="Cancel" Click="OverlayCancel_Click" Background="Transparent" BorderThickness="0" Foreground="#999" Margin="0,0,10,0" Cursor="Hand"/>
+                            <Button Content="Don't Save" Click="OverlayDontSave_Click" Background="Transparent" BorderThickness="0" Foreground="#D32F2F" Margin="0,0,10,0" Cursor="Hand"/>
+                            <Button Content="Save" Click="OverlaySave_Click" Background="#333" Foreground="White" Padding="15,8" BorderThickness="0" Cursor="Hand">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="4"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
             </Grid>
 
         </Grid>

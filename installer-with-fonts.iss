@@ -2,7 +2,7 @@
 ; This installer includes all required fonts and installs them automatically
 
 #define MyAppName "ThinkMine"
-#define MyAppVersion "1.1.3"
+#define MyAppVersion "1.1.4"
 #define MyAppPublisher "ThinkMine Publisher"
 #define MyAppURL "https://github.com/raiyaancreates/ThinkMine"
 #define MyAppExeName "ThinkMine.exe"
@@ -41,6 +41,8 @@ Name: "installfonts"; Description: "Install required fonts (recommended)"; Group
 [Files]
 ; Application files
 Source: "bin\Release\net8.0-windows\win-x64\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Explicitly include the icon for shortcuts
+Source: "app.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Font files (bundled but not registered by Inno)
 Source: "Fonts\*.ttf"; DestDir: "{app}\Fonts"; Flags: ignoreversion
@@ -49,9 +51,9 @@ Source: "Fonts\*.ttf"; DestDir: "{app}\Fonts"; Flags: ignoreversion
 Source: "LocalInstallFonts.ps1"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\app.ico"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; IconFilename: "{app}\app.ico"
 
 [Run]
 ; Run the font installer script
