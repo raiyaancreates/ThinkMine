@@ -82,13 +82,21 @@ namespace ThinkMine
             };
 
             // Onboarding
-            if (_settings.IsFirstRun)
+            string currentVersion = "1.1.1";
+            if (_settings.IsFirstRun || _settings.LastVersion != currentVersion)
             {
                 _settings.IsFullScreen = true; // Force Fullscreen
                 _settings.IsFirstRun = false;
+                _settings.LastVersion = currentVersion;
                 _settings.Save();
                 ShowWelcomeAnimation();
             }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            _isExiting = true;
+            _settings.Save();
         }
 
         private void ApplySettings()
