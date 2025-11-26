@@ -2,7 +2,7 @@
 ; This installer includes all required fonts and installs them automatically
 
 #define MyAppName "ThinkMine"
-#define MyAppVersion "1.1.1"
+#define MyAppVersion "1.1.2"
 #define MyAppPublisher "ThinkMine Publisher"
 #define MyAppURL "https://github.com/raiyaancreates/ThinkMine"
 #define MyAppExeName "ThinkMine.exe"

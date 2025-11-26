@@ -129,108 +129,6 @@ namespace ThinkMine
             try 
             { 
                 var font = new System.Windows.Media.FontFamily(_settings.CurrentFontFamily);
-                MainEditor.FontFamily = font;
-                FontBtn.ToolTip = _settings.CurrentFontFamily;
-                FontBtn.Text = _settings.CurrentFontFamily;
-            } 
-            catch { }
-
-            // Font Size (Default 24)
-            if (_settings.FontSize < 12) _settings.FontSize = 24;
-            MainEditor.FontSize = _settings.FontSize;
-            FontSizeBtn.Text = _settings.FontSize.ToString();
-
-            // Style
-            ApplyStyleState();
-
-            // Color
-            try 
-            { 
-                MainEditor.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom(_settings.LastTextColor); 
-            } 
-            catch { }
-
-            // Timer (Default 5:00)
-            _remainingSeconds = _settings.LastTimerSeconds > 0 ? _settings.LastTimerSeconds : 300;
-            UpdateTimerDisplay();
-            
-            MainEditor.Focus();
-        }
-
-        // Cursors
-        private System.Windows.Input.Cursor _cursorArrow;
-        private System.Windows.Input.Cursor _cursorHand;
-        
-        // Services
-        private AnalyticsService _analyticsService;
-        private UpdateService _updateService;
-        private string _updateUrl;
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            MainEditor.Focus();
-            UpdateDateTime();
-            
-            var dtTimer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(1) };
-            dtTimer.Tick += (s, args) => UpdateDateTime();
-            dtTimer.Start();
-
-            // Force Fullscreen if setting is true
-            if (_settings.IsFullScreen)
-            {
-                WindowStyle = WindowStyle.None;
-                WindowState = WindowState.Maximized;
-            }
-
-            // Load Custom Cursors
-            try
-            {
-                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                string arrowPath = Path.Combine(baseDir, "cursor_arrow.cur");
-                string handPath = Path.Combine(baseDir, "cursor_hand.cur");
-
-                if (File.Exists(arrowPath)) _cursorArrow = new System.Windows.Input.Cursor(arrowPath);
-                if (File.Exists(handPath)) _cursorHand = new System.Windows.Input.Cursor(handPath);
-
-                if (_cursorArrow != null) this.Cursor = _cursorArrow;
-                
-                // Handle Hand Cursor globally
-                Mouse.AddQueryCursorHandler(this, OnQueryCursor);
-                
-                // DEBUG: Confirm loading
-                // System.Windows.MessageBox.Show($"Cursors Loaded: Arrow={_cursorArrow != null}, Hand={_cursorHand != null}\nPath: {handPath}");
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show("Cursor Load Error: " + ex.Message);
-            }
-
-            // Initialize Services
-            _analyticsService = new AnalyticsService(_settings.ClientId);
-            _updateService = new UpdateService();
-
-            // Track Launch (Fire and Forget)
-            _ = _analyticsService.TrackLaunch();
-
-            // Check for Updates
-            CheckForUpdatesAsync();
-        }
-
-        private void OnQueryCursor(object sender, QueryCursorEventArgs e)
-        {
-            if (_cursorHand != null)
-            {
-                var element = e.OriginalSource as DependencyObject;
-                while (element != null)
-                {
-                    if (element is FrameworkElement fe && fe.Cursor == System.Windows.Input.Cursors.Hand)
-                    {
-                        e.Cursor = _cursorHand;
-                        e.Handled = true;
-                        return;
-                    }
-                    element = VisualTreeHelper.GetParent(element);
-                }
             }
         }
 
@@ -597,28 +495,6 @@ namespace ThinkMine
         private void LibraryClose_Click(object sender, MouseButtonEventArgs e)
         {
             LibraryOverlay.Visibility = Visibility.Collapsed;
-        }
-        
-        private void LibraryNew_Click(object sender, RoutedEventArgs e)
-        {
-            if (_isDirty)
-            {
-                var result = System.Windows.MessageBox.Show("Save changes to current file?", "New File", MessageBoxButton.YesNoCancel);
-                if (result == MessageBoxResult.Yes)
-                {
-                    SaveDocument();
-                }
-                else if (result == MessageBoxResult.Cancel)
-                {
-                    return; // User cancelled
-                }
-                // If No, proceed to create new file
-            }
-
-            // Create New
-            MainEditor.Document.Blocks.Clear();
-            _currentFilePath = null;
-            _isDirty = false;
             
             // Reset Timer to 5:00 on New File
             _remainingSeconds = 300;
