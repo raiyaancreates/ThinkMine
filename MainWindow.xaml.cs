@@ -80,22 +80,109 @@ namespace ThinkMine
                 _isDirty = true;
                 UpdateDockerPreview();
             };
+        }
 
-            // Onboarding
-            string currentVersion = "1.1.1";
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            // 1. Load Custom Cursors
+            try
+            {
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                
+                // Arrow Cursor
+                using (var stream = assembly.GetManifestResourceStream("ThinkMine.cursor_arrow.cur"))
+                {
+                    if (stream != null)
+                    {
+                        this.Cursor = new System.Windows.Input.Cursor(stream);
+                    }
+                }
+
+                // Hand Cursor (for buttons)
+                using (var stream = assembly.GetManifestResourceStream("ThinkMine.cursor_hand.cur"))
+                {
+                    if (stream != null)
+                    {
+                        var handCursor = new System.Windows.Input.Cursor(stream);
+                        
+                        // Apply to all buttons/interactive elements
+                        foreach (var btn in FindVisualChildren<Border>(this))
+                        {
+                            if (btn.Cursor == System.Windows.Input.Cursors.Hand)
+                            {
+                                btn.Cursor = handCursor;
+                            }
+                        }
+                        // Also apply to TextBlocks with Hand cursor
+                        foreach (var tb in FindVisualChildren<TextBlock>(this))
+                        {
+                            if (tb.Cursor == System.Windows.Input.Cursors.Hand)
+                            {
+                                tb.Cursor = handCursor;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Fallback to default cursors if loading fails
+                System.Diagnostics.Debug.WriteLine($"Cursor load error: {ex.Message}");
+            }
+
+            // 2. Welcome / Onboarding Logic
+            string currentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            
+            // Show Welcome if First Run OR Version Changed
             if (_settings.IsFirstRun || _settings.LastVersion != currentVersion)
             {
-                _settings.IsFullScreen = true; // Force Fullscreen
+                _settings.IsFullScreen = true; // Force Fullscreen on update/install
                 _settings.IsFirstRun = false;
                 _settings.LastVersion = currentVersion;
                 _settings.Save();
-                ShowWelcomeAnimation();
+                
+                // Slight delay to ensure window is rendered
+                Dispatcher.InvokeAsync(async () => 
+                {
+                    await Task.Delay(500);
+                    ShowWelcomeAnimation();
+                });
+            }
+        }
+
+        // Helper to find children
+        private static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if (depObj != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
+
+                    foreach (T childOfChild in FindVisualChildren<T>(child))
+                    {
+                        yield return childOfChild;
+                    }
+                }
             }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            _isExiting = true;
+            if (_isExiting) return; // Already handling exit
+
+            // If dirty, show UnsavedOverlay
+            if (_isDirty)
+            {
+                e.Cancel = true; // Stop closing
+                UnsavedOverlay.Visibility = Visibility.Visible;
+                return;
+            }
+            
             _settings.Save();
         }
 
@@ -111,8 +198,6 @@ namespace ThinkMine
             {
                 WindowStyle = WindowStyle.None;
                 WindowState = WindowState.Maximized;
-                // Force update just in case
-                this.WindowState = WindowState.Maximized;
             }
 
             // Background
@@ -128,8 +213,19 @@ namespace ThinkMine
             
             try 
             { 
-                var font = new System.Windows.Media.FontFamily(_settings.CurrentFontFamily);
+                MainEditor.FontFamily = new System.Windows.Media.FontFamily(_settings.CurrentFontFamily);
             }
+            catch { }
+            
+            // Restore Font Size
+            if (_settings.FontSize > 0)
+            {
+                MainEditor.FontSize = _settings.FontSize;
+                FontSizeBtn.Text = _settings.FontSize.ToString();
+            }
+            
+            // Restore Bold/Italic
+            ApplyStyleState();
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -437,28 +533,65 @@ namespace ThinkMine
         
         private void CycleAlignment(bool reverse)
         {
+            // Cycle: Left -> Center (Horizontal) -> Center (Vertical+Horizontal) -> Right -> Justify
+            
             var align = MainEditor.Document.TextAlignment;
+            var vertical = MainEditor.VerticalContentAlignment;
+            
+            // Current State Logic
+            int state = 0; // 0=Left, 1=Center, 2=Middle(Center+Vertical), 3=Right, 4=Justify
+            
+            if (align == TextAlignment.Left) state = 0;
+            else if (align == TextAlignment.Center && vertical == VerticalAlignment.Top) state = 1;
+            else if (align == TextAlignment.Center && vertical == VerticalAlignment.Center) state = 2;
+            else if (align == TextAlignment.Right) state = 3;
+            else if (align == TextAlignment.Justify) state = 4;
+
             if (reverse)
             {
-                if (align == TextAlignment.Left) align = TextAlignment.Justify;
-                else if (align == TextAlignment.Justify) align = TextAlignment.Right;
-                else if (align == TextAlignment.Right) align = TextAlignment.Center;
-                else align = TextAlignment.Left;
+                state--;
+                if (state < 0) state = 4;
             }
             else
             {
-                if (align == TextAlignment.Left) align = TextAlignment.Center;
-                else if (align == TextAlignment.Center) align = TextAlignment.Right;
-                else if (align == TextAlignment.Right) align = TextAlignment.Justify;
-                else align = TextAlignment.Left;
+                state++;
+                if (state > 4) state = 0;
             }
-            MainEditor.Document.TextAlignment = align;
-            
-            string label = "L";
-            if (align == TextAlignment.Center) label = "C";
-            if (align == TextAlignment.Right) label = "R";
-            if (align == TextAlignment.Justify) label = "J";
-            AlignBtn.Text = label;
+
+            // Apply New State
+            switch (state)
+            {
+                case 0: // Left
+                    MainEditor.Document.TextAlignment = TextAlignment.Left;
+                    MainEditor.VerticalContentAlignment = VerticalAlignment.Top;
+                    AlignBtn.Text = "L";
+                    AlignBtn.ToolTip = "Align Left";
+                    break;
+                case 1: // Center
+                    MainEditor.Document.TextAlignment = TextAlignment.Center;
+                    MainEditor.VerticalContentAlignment = VerticalAlignment.Top;
+                    AlignBtn.Text = "C";
+                    AlignBtn.ToolTip = "Align Center";
+                    break;
+                case 2: // Middle (Vertical Center)
+                    MainEditor.Document.TextAlignment = TextAlignment.Center;
+                    MainEditor.VerticalContentAlignment = VerticalAlignment.Center;
+                    AlignBtn.Text = "M";
+                    AlignBtn.ToolTip = "Align Middle (Vertical)";
+                    break;
+                case 3: // Right
+                    MainEditor.Document.TextAlignment = TextAlignment.Right;
+                    MainEditor.VerticalContentAlignment = VerticalAlignment.Top;
+                    AlignBtn.Text = "R";
+                    AlignBtn.ToolTip = "Align Right";
+                    break;
+                case 4: // Justify
+                    MainEditor.Document.TextAlignment = TextAlignment.Justify;
+                    MainEditor.VerticalContentAlignment = VerticalAlignment.Top;
+                    AlignBtn.Text = "J";
+                    AlignBtn.ToolTip = "Justify";
+                    break;
+            }
         }
 
         private void CycleFontSize(bool reverse)
